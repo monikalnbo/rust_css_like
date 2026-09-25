@@ -1,0 +1,11 @@
+[package]
+name = "data-bridge"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+element-core = { workspace = true }
+style-system = { workspace = true }
+serde = { workspace = true }
+rusqlite = { workspace = true }

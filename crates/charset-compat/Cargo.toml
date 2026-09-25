@@ -1,0 +1,8 @@
+[package]
+name = "charset-compat"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+# 纯标准库实现，零第三方依赖，极致安全轻量

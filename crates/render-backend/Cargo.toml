@@ -1,0 +1,11 @@
+[package]
+name = "render-backend"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+css-types = { workspace = true }
+element-core = { workspace = true }
+layout-engine = { workspace = true }
+tiny-skia = { workspace = true }

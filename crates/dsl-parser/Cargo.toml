@@ -1,0 +1,9 @@
+[package]
+name = "dsl-parser"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+css-types = { workspace = true }
+charset-compat = { workspace = true }

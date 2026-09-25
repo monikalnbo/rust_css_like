@@ -1,0 +1,12 @@
+[package]
+name = "live-runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+dsl-parser = { workspace = true }
+element-core = { workspace = true }
+style-system = { workspace = true }
+layout-engine = { workspace = true }
+bitflags = { workspace = true }

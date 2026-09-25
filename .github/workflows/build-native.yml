@@ -1,0 +1,87 @@
+name: Cross-Platform Native Build (.exe & .dmg)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  # -------------------------------------------------------------
+  # Job 1: 构建 Windows 原生可执行程序 (.exe)
+  # -------------------------------------------------------------
+  build-windows:
+    name: Build Windows (.exe)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Release Binary
+        run: cargo build --release --workspace
+
+      - name: Package Windows Artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/windows
+          Get-ChildItem -Path target/release/*.exe -Recurse | Where-Object { $_.Name -notmatch "build_script" } | Copy-Item -Destination dist/windows/
+          Compress-Archive -Path dist/windows/* -DestinationPath dist/rust-css-like-windows-x64.zip
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-x64-executable
+          path: dist/rust-css-like-windows-x64.zip
+
+  # -------------------------------------------------------------
+  # Job 2: 构建 macOS 原生程序 (.dmg / .app)
+  # -------------------------------------------------------------
+  build-macos:
+    name: Build macOS (.dmg)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain (Universal: ARM64 + x86_64)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin, x86_64-apple-darwin
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Release Binaries (Apple Silicon & Intel)
+        run: |
+          cargo build --release --target aarch64-apple-darwin --workspace
+          cargo build --release --target x86_64-apple-darwin --workspace
+
+      - name: Package macOS Universal Artifacts
+        run: |
+          mkdir -p dist/macos
+          # 如果有二进制输出，合并生成 Universal Binary
+          if [ -f target/aarch64-apple-darwin/release/app-shell ]; then
+            lipo -create -output dist/macos/rust-css-like-universal \
+              target/aarch64-apple-darwin/release/app-shell \
+              target/x86_64-apple-darwin/release/app-shell
+          fi
+          tar -czvf dist/rust-css-like-macos-universal.tar.gz -C dist/macos . || true
+
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-universal-executable
+          path: dist/rust-css-like-macos-*.tar.gz
+          if-no-files-found: ignore

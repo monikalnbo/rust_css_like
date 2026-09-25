@@ -1,0 +1,55 @@
+[workspace]
+members = [
+    "crates/css-types",
+    "crates/dsl-parser",
+    "crates/element-core",
+    "crates/style-system",
+    "crates/css-animation",
+    "crates/layout-engine",
+    "crates/live-runtime",
+    "crates/data-bridge",
+    "crates/crypto-pack",
+    "crates/charset-compat",
+    "crates/render-backend",
+    "crates/script-engine",
+    "crates/app-shell",
+    "crates/text-layout",
+    "crates/wasm-runtime",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+authors = ["Rust CSS-Like Team"]
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+# 内部 Crate 互联
+css-types = { path = "crates/css-types" }
+dsl-parser = { path = "crates/dsl-parser" }
+element-core = { path = "crates/element-core" }
+style-system = { path = "crates/style-system" }
+css-animation = { path = "crates/css-animation" }
+layout-engine = { path = "crates/layout-engine" }
+live-runtime = { path = "crates/live-runtime" }
+data-bridge = { path = "crates/data-bridge" }
+crypto-pack = { path = "crates/crypto-pack" }
+charset-compat = { path = "crates/charset-compat" }
+render-backend = { path = "crates/render-backend" }
+script-engine = { path = "crates/script-engine" }
+app-shell = { path = "crates/app-shell" }
+text-layout = { path = "crates/text-layout" }
+wasm-runtime = { path = "crates/wasm-runtime" }
+
+# 外部生产级纯 Rust 基础库
+bitflags = "2.4"
+taffy = "0.7"
+serde = { version = "1.0", features = ["derive"] }
+tiny-skia = "0.11"
+winit = "0.29"
+softbuffer = "0.4"
+rusqlite = { version = "0.31", features = ["bundled"] }
+cosmic-text = "0.12"
+wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = ["CanvasRenderingContext2d", "Document", "Element", "HtmlCanvasElement", "Window"] }

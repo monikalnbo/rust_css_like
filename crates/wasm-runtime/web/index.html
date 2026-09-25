@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rust CSS-Like 交互式实时演练场 (WebAssembly Playground)</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #f8fafc; height: 100vh; display: flex; flex-direction: column; }
+        header { padding: 12px 24px; background: #1e293b; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 16px; font-weight: 600; color: #38bdf8; }
+        .version-badge { font-size: 12px; background: #0369a1; padding: 3px 8px; border-radius: 4px; }
+        .workspace { flex: 1; display: flex; overflow: hidden; }
+        .editor-pane { width: 50%; height: 100%; border-right: 1px solid #334155; display: flex; flex-direction: column; }
+        .pane-header { padding: 8px 16px; background: #1e293b; font-size: 12px; color: #94a3b8; border-bottom: 1px solid #334155; }
+        textarea { flex: 1; background: #0f172a; color: #e2e8f0; border: none; padding: 16px; font-family: "JetBrains Mono", Consolas, monospace; font-size: 14px; line-height: 1.6; resize: none; outline: none; }
+        .preview-pane { width: 50%; height: 100%; display: flex; flex-direction: column; background: #1e293b; }
+        .canvas-container { flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        canvas { background: #ffffff; border-radius: 8px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>⚡ Rust CSS-Like 原生引擎在线演练场</h1>
+        <span id="version" class="version-badge">WASM 加载中...</span>
+    </header>
+    <div class="workspace">
+        <div class="editor-pane">
+            <div class="pane-header">源码编辑器 (DSL Source)</div>
+            <textarea id="dsl-input">window {
+    card {
+        txt "Hello Rust CSS-Like WASM Playground";
+        btn {
+            txt "Click Me";
+        }
+    }
+}</textarea>
+        </div>
+        <div class="preview-pane">
+            <div class="pane-header">Canvas 实时光栅化输出 (Hardware Accelerated 2D)</div>
+            <div class="canvas-container">
+                <canvas id="viewport" width="480" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import init, { render_dsl_to_canvas, get_engine_version } from './pkg/wasm_runtime.js';
+
+        async function main() {
+            try {
+                await init();
+                document.getElementById('version').textContent = get_engine_version();
+                
+                const input = document.getElementById('dsl-input');
+                const rerender = () => {
+                    render_dsl_to_canvas('viewport', input.value);
+                };
+
+                input.addEventListener('input', rerender);
+                rerender();
+            } catch (err) {
+                console.error("WASM 加载错误:", err);
+                document.getElementById('version').textContent = "加载失败: " + err;
+            }
+        }
+        main();
+    </script>
+</body>
+</html>

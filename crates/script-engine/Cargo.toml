@@ -1,0 +1,8 @@
+[package]
+name = "script-engine"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+# 纯 Rust 轻量实现，无任何 JS 引擎/V8 臃肿依赖

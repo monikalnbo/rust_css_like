@@ -1,0 +1,69 @@
+// ==============================================================================
+// 示例程序：用我们的自研极简语言编写的原生前端应用 (examples/app.ui)
+// 语法特色：
+// 1. 零复杂头特征、超短原语、标记/样式/脚本三位一体
+// 2. 直连本地 SQLite 数据库
+// 3. 挂载已注册的自定义底层交互特效 (如 InteractiveRipple，点击产生物理水波)
+// ==============================================================================
+
+// 1. 前端全局/局部响应式状态 (无需冗长 class 或 redux)
+let title = "Rust 原生商业工作台"
+let is_dark = true
+let count = 0
+let username = "开发者"
+
+// 2. 数据库查询结果直接绑定响应式列表 (本地 SQLite 单文件直连)
+let tasks = db.query("SELECT id, title, status FROM tasks ORDER BY id DESC")
+let new_task_input = ""
+
+// 3. 原生窗体声明：开门见山，零冗余样板代码
+win "$title" (960, 640) bg=(is_dark ? #0f172a : #f8fafc) {
+
+    // 顶部导航栏 (横向 Flex 流)
+    row pad=16 bg=#1e293b align=center justify=between {
+        row gap=10 align=center {
+            box w=12 h=12 rad=6 bg=#22c55e // 在线状态小绿点
+            txt "系统控制中心" #f8fafc 16px bold
+        }
+
+        row gap=8 align=center {
+            txt "当前用户: $username" #94a3b8 13px
+            
+            // 动作流绑定：'->' 触发轻量内置脚本执行
+            btn (is_dark ? "切换浅色" : "切换深色") pad=(6,12) bg=#334155 rad=6 -> is_dark = !is_dark
+            btn "计数器: $count" pad=(6,14) bg=#4f46e5 rad=6 -> count += 1
+        }
+    }
+
+    // 主内容区 (纵向排列)
+    col flex=1 pad=20 gap=16 {
+
+        // 快捷添加任务卡片 (挂载自研底层交互水波特效！)
+        // 用户在卡片内移动或点击时，底层自动将物理坐标 (x,y) 派发给特效，产生扩散水波！
+        row pad=16 bg=#1e293b rad=8 gap=8 align=center effect="InteractiveRipple" {
+            inp placeholder="输入要添加的本地任务..." bind=new_task_input flex=1
+            btn "保存到 SQLite" bg=#4f46e5 rad=6 pad=(8,16) -> {
+                db.execute("INSERT INTO tasks (title, status) VALUES (?, 'active')", [new_task_input])
+                new_task_input = ""
+            }
+        }
+
+        // 任务列表展示
+        txt "待办任务列表" #94a3b8 14px bold
+
+        col gap=8 {
+            for item in tasks {
+                row pad=12 bg=#1e293b rad=6 justify=between align=center {
+                    txt item.title #f8fafc 14px
+                    btn "删除" #ef4444 rad=4 pad=(4,8) -> db.execute("DELETE FROM tasks WHERE id = ?", [item.id])
+                }
+            }
+        }
+
+        // 自定义原生扩展组件区
+        box pad=16 bg=#1e293b rad=8 {
+            txt "调用底层自研原生扩展组件" #6366f1 14px bold
+            plugin "CustomChart" type="line" height=180
+        }
+    }
+}

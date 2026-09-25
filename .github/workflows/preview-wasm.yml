@@ -1,0 +1,51 @@
+name: WebAssembly Live Playground on GitHub Pages
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy-playground:
+    name: Build & Deploy WASM Live Studio
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - name: Build WASM Core & Prepare Playground
+        run: |
+          mkdir -p public
+          # 1. 真实编译 wasm-runtime 并输出至 public/pkg
+          wasm-pack build crates/wasm-runtime --target web --out-dir ../../public/pkg
+          # 2. 拷贝在线交互演练场入口 HTML
+          cp crates/wasm-runtime/web/index.html public/index.html
+
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
