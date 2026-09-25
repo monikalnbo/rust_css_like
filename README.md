@@ -1,249 +1,257 @@
-# 🚀 Rust CSS-Like (`.ui`) — 专为高性能原生与 Web 打造的声明式前端语言
+# 🚀 Rust CSS-Like (`.ui`)
 
 <div align="center">
+
+**A unified, declarative frontend programming language and high-performance native UI engine built with Rust.**
 
 [![CI - Workspace Check & Test](https://github.com/monikalnbo/rust_css_like/actions/workflows/ci.yml/badge.svg)](https://github.com/monikalnbo/rust_css_like/actions/workflows/ci.yml)
 [![Cross-Platform Native Build](https://github.com/monikalnbo/rust_css_like/actions/workflows/build-native.yml/badge.svg)](https://github.com/monikalnbo/rust_css_like/actions/workflows/build-native.yml)
 [![WebAssembly Live Playground](https://img.shields.io/badge/WASM_Playground-Online-brightgreen)](https://monikalnbo.github.io/rust_css_like/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**一个将「标记结构、紧凑样式、响应式逻辑」三位一体的原生级前端编程语言与多端渲染引擎。**  
-*没有 HTML 的标签闭合地狱，没有 CSS 的类名命名焦虑，没有 JS/Redux 的沉重样板代码。*
+[English](README.md) | [简体中文](README_zh.md)
 
-[🌐 在线交互演练场](https://monikalnbo.github.io/rust_css_like/) • [📘 语言参考手册](docs/LANGUAGE_GUIDE.md) • [💻 预编译发布包下载](https://github.com/monikalnbo/rust_css_like/actions) • [📚 架构全景白皮书](docs/01_REQUIREMENTS_AND_ARCHITECTURE.md)
+---
+
+### *No HTML closing tag fatigue. No CSS cascading conflicts. No JS/Redux boilerplate.*
+
+[🌐 Live WASM Playground](https://monikalnbo.github.io/rust_css_like/) • [📘 Language Reference Manual](docs/LANGUAGE_GUIDE.md) • [💻 Download Releases (.exe/.dmg)](https://github.com/monikalnbo/rust_css_like/actions) • [📚 Architecture Whitepaper](docs/01_REQUIREMENTS_AND_ARCHITECTURE.md)
 
 </div>
 
 ---
 
-## 目录
-1. [为什么要用它写前端？（语言诞生哲学）](#一-为什么要用它写前端语言诞生哲学)
-2. [3 分钟语法极速上手 (Hello World)](#二-3-分钟语法极速上手-hello-world)
-3. [核心语法体系剖析](#三-核心语法体系剖析)
-   - [3.1 布局与标签原语 (`win`, `row`, `col`, `box`, `card`)](#31-布局与标签原语)
-   - [3.2 极简样式属性表 (对齐 CSS)](#32-极简样式属性表)
-   - [3.3 响应式状态与动作流 (`let`, `->`)](#33-响应式状态与动作流)
-   - [3.4 控制流：条件与列表 (`if`, `for`)](#34-控制流条件与列表)
-   - [3.5 模版组件与跨文件导入 (`component`, `@import`)](#35-模版组件与跨文件导入)
-   - [3.6 全栈数据库与物理特效 (`db.query`, `effect`)](#36-全栈数据库与物理特效)
-4. [三种多端运行与体验途径](#四-三种多端运行与体验途径)
-5. [完整文档与索引清单 (Docs & Examples)](#五-完整文档与索引清单)
-6. [底层 12 大微内核引擎矩阵 (Engine Internals)](#六-底层-12-大微内核引擎矩阵)
+## 📖 Table of Contents
+1. [Why Another Frontend Language?](#-why-another-frontend-language)
+2. [How It Works Under the Hood](#-how-it-works-under-the-hood)
+3. [Language Tour & Syntax Guide](#-language-tour--syntax-guide)
+4. [Real-World Examples](#-real-world-examples)
+5. [How to Run & Deploy](#-how-to-run--deploy)
+6. [Extensibility & Plugin Bus](#-extensibility--plugin-bus)
+7. [Architecture Matrix (15 Crates)](#-architecture-matrix-15-crates)
+8. [Documentation Index](#-documentation-index)
 
 ---
 
-## 一、 为什么要用它写前端？（语言诞生哲学）
+## 💡 Why Another Frontend Language?
 
-传统前端技术栈（HTML5 + CSS3 + JavaScript / TypeScript + React / Vue / Electron）历经数十年演化，带来了极其沉重的包袱：
-1. **多语言认知割裂**：开发者必须在 HTML（结构）、CSS（样式）、JS/TS（逻辑）与 JSX 之间反复切换心智模型；
-2. **闭合标签冗余**：面对无穷无尽的 `<div></div>`、`<span></span>` 闭合地狱；
-3. **样式组织困扰**：BEM 命名规范、CSS Modules、Tailwind 冗长类名等层出不穷，却始终面临样式层叠覆盖不可控的风险；
-4. **运行时庞大迟钝**：一个简单的计算器桌面应用，打包 Electron 后动辄 150MB~300MB，内存占用高达 100MB+，启动延迟 500ms 以上。
+Modern frontend engineering (HTML5, CSS3, JavaScript/TypeScript, React/Vue, Electron) has accumulated tremendous friction over the last two decades:
 
-**Rust CSS-Like (`.ui`) 将前端开发回归至纯粹的声明式语言本源**：
+| Pain Points in Traditional Stack | How Rust CSS-Like (`.ui`) Solves It |
+| :--- | :--- |
+| **Cognitive Fragmentation**: Switching between HTML structure, CSS rules, JS hooks, and JSX files. | **Unified Language Paradigm**: Markup, styles, and reactive actions live in one clean syntax with `{}` scopes. |
+| **Closing Tag Fatigue**: Infinite `<div></div>` and `</span>` trees. | **Zero Closing Tags**: Pure curly braces `{}` delineate scope naturally. |
+| **CSS Naming Anxiety**: BEM, CSS Modules, utility-first classes, specificity overrides. | **Inline Shortened Properties**: `pad=16 bg=#1e293b rad=8 flex=1` written directly on elements. |
+| **Bloated Runtimes**: Electron desktop apps start at 150MB+ and consume 100MB+ RAM. | **Ultralight & Blazingly Fast**: Pure native binary (~1.2 MB), <15ms cold start, only 10MB~25MB RAM. |
+| **No Native Backend Connectivity**: Requires separate Node/REST/GraphQL backends. | **Direct Embedded Database**: Direct SQL queries (`db.query`) right inside your UI file. |
 
 ```scss
-// 这就是全部！没有 HTML 头，没有 CSS 文件，没有 npm 安装，毫秒级响应
+// A complete, reactive, cross-platform desktop application in 12 lines
 let count = 0
 
-win "极简原生应用" (400, 300) bg=#0f172a {
+win "Counter App" (400, 300) bg=#0f172a {
     col pad=32 gap=16 align=center justify=center flex=1 {
-        txt "当前计数: $count" #f8fafc 24px bold
+        txt "Counter: $count" #f8fafc 24px bold
         row gap=12 {
-            btn "减少 (-1)" pad=(8,16) bg=#334155 rad=6 -> count -= 1
-            btn "增加 (+1)" pad=(8,16) bg=#4f46e5 rad=6 -> count += 1
+            btn "Decrease (-1)" pad=(8, 16) bg=#334155 rad=6 -> count -= 1
+            btn "Increase (+1)" pad=(8, 16) bg=#4f46e5 rad=6 -> count += 1
         }
     }
 }
 ```
 
-* **体积仅 ~1.2 MB**：纯原生 Rust 编译产物，零 Chromium/Node.js 冗余！
-* **启动仅 < 15 ms**：毫秒级直达物理屏幕，内存占用仅 10MB~25MB！
-* **全平台统一分发**：一套 `.ui` 代码，一键出 Windows `.exe`、macOS `.app`、Linux 及 WebAssembly！
+---
+
+## ⚙️ How It Works Under the Hood
+
+The engine is engineered as a **5-Layer Strictly Unidirectional DAG (Directed Acyclic Graph)** microkernel. Here is how your `.ui` source code transforms into physical pixels:
+
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Phase 1: Lexing & AST Parsing                   │
+│   Source (.ui) ──► dsl-parser (Bracket State Machine) ──► Scope AST    │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Phase 2: Virtual DOM & Styling                  │
+│   Scope AST ──► element-core (Virtual DOM) ──► style-system (Cascading)│
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Phase 3: Geometry & Text Layout                 │
+│   layout-engine (Taffy 0.7 Flexbox) ──► text-layout (cosmic-text)      │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Phase 4: DisplayList Assembly                   │
+│   render-backend: Collects DrawCommands (Rects, Text, Shadows, Clips)   │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                        Phase 5: Multi-Target Output                    │
+│   Desktop (tiny-skia / winit)  │  Browser (WebAssembly / HTML5 Canvas) │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+1. **Parser Layer (`dsl-parser`)**: Tokenizes the code into tokens, tracks `{}` depths with a state machine, and builds a hierarchical `ScopeBlock` AST.
+2. **DOM & Style Layer (`element-core` & `style-system`)**: Instantiates the virtual node tree and resolves 7-level CSS cascading priority into compact `ComputedStyle` structs.
+3. **Geometry & Typography (`layout-engine` & `text-layout`)**: Bridges `ComputedStyle` into Taffy Flexbox layout, computing pixel-perfect `LayoutRect`s, while `cosmic-text` shapes UTF-8 text with word-wrapping and CJK full-width metrics.
+4. **Drawing Pipeline (`render-backend`)**: Emits hardware-agnostic `DrawCommand` primitives into an immutable `DisplayList`.
+5. **Rasterization (`app-shell` / `wasm-runtime`)**: Renders pixels directly to physical framebuffers via `tiny-skia` on desktop or HTML5 `<canvas>` via WebAssembly.
 
 ---
 
-## 二、 3 分钟语法极速上手 (Hello World)
+## 🎨 Language Tour & Syntax Guide
 
-创建一个 `hello.ui` 文件：
+### 1. Window & Layout Containers
+* `win "Title" (Width, Height)`: Top-level native window.
+* `row`: Horizontal flexbox flow (left-to-right).
+* `col`: Vertical flexbox flow (top-to-bottom).
+* `box`: Generic box-model container (margin, padding, border, radius, shadow).
+* `card`: Preset card element with shadow and rounded styling.
 
+### 2. Built-in Shortened Styles (CSS Aligned)
+* **Spacing**: `pad=16` (padding), `margin=12`, `gap=10` (flex item spacing).
+* **Sizing**: `w=200`, `h=48`, `w=100%`, `flex=1` (flex-grow).
+* **Alignment**: `align=center|start|end` (align-items), `justify=between|center|around` (justify-content).
+* **Visuals**: `bg=#1e293b` (background), `rad=8` (border-radius), `border=(1, #334155)`, `opacity=0.9`.
+* **Typography**: `#hex` (color), `16px` (font-size), `bold`, `italic`.
+
+### 3. Reactive State (`let`) & Event Streams (`->`)
+Variables declared with `let` are automatically reactive:
 ```scss
-let message = "你好，Rust CSS-Like 世界！"
 let is_dark = true
+let username = "Alice"
 
-win "我的首个前端应用" (500, 360) bg=(is_dark ? #0f172a : #f8fafc) {
-    col pad=30 gap=20 align=center justify=center flex=1 {
-        // 1. 文本图元展示响应式状态
-        txt "$message" (is_dark ? #f8fafc : #0f172a) 20px bold
+// Template interpolation with $var
+txt "Welcome, $username!" (is_dark ? #f8fafc : #0f172a)
 
-        // 2. 交互按钮与动作流绑定
-        row gap=12 {
-            btn (is_dark ? "切换为浅色" : "切换为深色") pad=(8, 16) bg=#4f46e5 rad=8 #fff -> {
-                is_dark = !is_dark
-            }
-            btn "点赞" pad=(8, 16) bg=#22c55e rad=8 #fff -> {
-                message = "感谢你的支持！❤️"
-            }
-        }
-    }
-}
+// '->' arrow leads user actions directly
+btn (is_dark ? "Light Mode" : "Dark Mode") -> is_dark = !is_dark
 ```
 
----
-
-## 三、 核心语法体系剖析
-
-### 3.1 布局与标签原语
-语言提供对齐现代化 Flexbox 的极简容器标签，所有嵌套以 `{}` 自动界定作用域：
-* `win "标题" (宽, 高)`：定义原生顶层主窗口；
-* `row`：横向弹性流布局（子项由左向右排布）；
-* `col`：纵向弹性流布局（子项自上而下排布）；
-* `box`：通用盒模型容器（支持绝对/相对定位、圆角与边框）；
-* `card`：预设阴影质感的独立展示卡片；
-* `txt "内容"`：高性能排版文本图元；
-* `btn "按钮"`：内置物理交互动效的按钮控件；
-* `inp placeholder="提示"`：带双向状态绑定的输入控件。
-
-### 3.2 极简样式属性表
-告别繁琐的 CSS 语法，样式属性直接以内联参数方式书写：
-```scss
-// 内边距 16px、外边距 12px、子项间距 10px、圆角 8px、背景色 #1e293b
-box pad=16 margin=12 gap=10 rad=8 bg=#1e293b
-```
-* **盒模型度量**：`pad` (内边距), `margin` (外边距), `gap` (子间距), `w` (宽度), `h` (高度), `flex` (弹性占用比例)；
-* **对齐方式**：`align=center|start|end` (交叉轴), `justify=between|center|around` (主轴)；
-* **视觉渲染**：`bg` (背景色), `rad` (圆角半径), `border` (边框), `opacity` (不透明度), `shadow` (盒阴影)；
-* **文本排版**：`#hex` (字体颜色), `16px` (字号), `bold` (加粗), `italic` (斜体)。
-
-### 3.3 响应式状态与动作流
-* **状态定义**：以 `let` 关键字声明，自动加入全局/局部响应式依赖图谱：
-  ```scss
-  let username = "管理员"
-  let is_logged_in = false
-  ```
-* **动作流引导 (`->`)**：用户交互由单向箭头 `->` 触发，直接执行轻量脚本语句：
-  ```scss
-  btn "登录" -> is_logged_in = true
-  ```
-
-### 3.4 控制流：条件与列表
-语言在标记内部原生支持 `if` 和 `for` 语句，直接与 UI 树深度融合：
+### 4. Control Flow: Loops & Conditions
 ```scss
 col gap=8 {
-    // 列表循环展开
-    for item in tasks {
+    // List rendering
+    for task in tasks {
         row pad=12 bg=#1e293b rad=6 justify=between {
-            txt item.title #fff 14px
-            btn "完成" -> item.done = true
+            txt task.title #fff 14px
+            btn "Done" -> task.done = true
         }
     }
 
-    // 条件分支渲染
+    // Conditional branches
     if len(tasks) == 0 {
-        txt "暂无任何待办任务" #94a3b8 12px
+        txt "No pending tasks." #94a3b8 12px
     }
 }
 ```
 
-### 3.5 模版组件与跨文件导入
-* **组件声明**：使用 `component` 封装高复用控件：
-  ```scss
-  component StatCard(title, value, color) {
-      col pad=16 bg=#1e293b rad=8 gap=6 flex=1 {
-          txt title #94a3b8 12px
-          txt value color 20px bold
-      }
-  }
-  ```
-* **跨文件导入**：使用 `@import` 组织大型前端工程：
-  ```scss
-  @import "components/header.ui";
-  @import "components/sidebar.ui";
-  ```
+### 5. Reusable Components & Imports
+```scss
+component StatCard(title, value, color) {
+    col pad=16 bg=#1e293b rad=8 gap=6 flex=1 {
+        txt title #94a3b8 12px
+        txt value color 20px bold
+    }
+}
 
-### 3.6 全栈数据库与物理特效
-* **前端直连 SQLite**：
-  ```scss
-  let tasks = db.query("SELECT id, title FROM tasks ORDER BY id DESC")
-  btn "添加" -> db.execute("INSERT INTO tasks (title) VALUES (?)", [new_title])
-  ```
-* **挂载底层物理光晕特效**：
-  ```scss
-  // 鼠标移动或点击时，底层自动将物理坐标交由 GPU 计算产生真实水波扩散
-  card pad=16 bg=#1e293b rad=8 effect="InteractiveRipple" {
-      txt "点击卡片感受物理光晕水波" #f8fafc
-  }
-  ```
+// In main view:
+row gap=12 {
+    StatCard(title="Active Users", value="12,480", color=#22c55e)
+    StatCard(title="Server Load", value="18.2%", color=#3b82f6)
+}
+```
 
 ---
 
-## 四、 三种多端运行与体验途径
+## 💡 Real-World Examples
 
-### 1. 🌐 WebAssembly 在线演练场（免安装秒开）
-无需配置任何本地环境，直接访问 GitHub Pages 在线沙盒：  
+All working code is available in the [`examples/`](examples/) directory:
+
+1. **[examples/counter.ui](examples/counter.ui)**: Minimal 15-line counter with bidirectional reactive flow.
+2. **[examples/todo_app.ui](examples/todo_app.ui)**: Todo list with dynamic list additions, two-way input binding (`bind=text`), and item completion.
+3. **[examples/components_demo.ui](examples/components_demo.ui)**: Custom component declarations and theme color reusability.
+4. **[examples/app.ui](examples/app.ui)**: Full commercial application with SQLite integration, navigation bars, and GPU ripple shaders.
+
+---
+
+## 🚀 How to Run & Deploy
+
+### Option 1: Instant Browser Sandbox (WebAssembly)
+No local installation required! Open in your browser:  
 👉 **[https://monikalnbo.github.io/rust_css_like/](https://monikalnbo.github.io/rust_css_like/)**
 
-### 2. 💻 下载预编译原生可执行包（Windows / macOS / Linux）
-GitHub Actions 会在每次提交时，全自动交叉编译各平台发布包：  
-👉 前往 **[GitHub Actions 页面](https://github.com/monikalnbo/rust_css_like/actions)**，点击最新的 **Cross-Platform Native Build**，在页面底部的 **Artifacts** 区域即可一键下载：
-* `windows-x64-executable.zip`：包含单文件 Windows 原生 `.exe`
-* `macos-universal-executable.tar.gz`：包含支持 Apple Silicon (M1/M2/M3/M4) 与 Intel 的 Universal 运行包
-* `linux-x64-executable.tar.gz`：Linux x86_64 原生独立可执行文件
+### Option 2: Download Precompiled Native Binaries
+GitHub Actions automatically cross-compiles release binaries on every commit:  
+👉 Go to **[GitHub Actions Releases](https://github.com/monikalnbo/rust_css_like/actions)**, select the latest **Cross-Platform Native Build**, and download from **Artifacts**:
+* `windows-x64-executable.zip`: Standalone Windows `.exe`.
+* `macos-universal-executable.tar.gz`: Universal macOS binary (Apple Silicon M1~M4 + Intel).
+* `linux-x64-executable.tar.gz`: Linux x86_64 standalone binary.
 
-### 3. 🛠️ 本地编译与开发
+### Option 3: Local Compilation (Rust 1.75+)
 ```bash
-# 1. 克隆本仓库
+# 1. Clone repository
 git clone https://github.com/monikalnbo/rust_css_like.git
 cd rust_css_like
 
-# 2. 执行整个工程全量单元测试 (30 项单元测试 100% 通过)
+# 2. Run full workspace test suite (30 unit & integration tests, 100% passing)
 cargo test --workspace
 
-# 3. 本地启动 App 渲染主外壳
+# 3. Launch native desktop shell
 cargo run -p app-shell
 ```
 
 ---
 
-## 五、 完整文档与索引清单
+## 🔌 Extensibility & Plugin Bus
 
-| 文档 / 示例 | 路径 | 核心定位与说明 |
-| :--- | :--- | :--- |
-| 📘 **前端语言完全手册** | [docs/LANGUAGE_GUIDE.md](docs/LANGUAGE_GUIDE.md) | **必读**：完整的 `.ui` 语法字典、选择器、控制流、标准库函数与组件规约 |
-| 📚 **系统架构设计蓝图** | [docs/01_REQUIREMENTS_AND_ARCHITECTURE.md](docs/01_REQUIREMENTS_AND_ARCHITECTURE.md) | 深入五层微内核设计、数据流水线模型与无环依赖规范 |
-| 🌐 **HTML/CSS 对齐规范** | [docs/03_HTML_CSS_PHP_ALIGNMENT_SPEC.md](docs/03_HTML_CSS_PHP_ALIGNMENT_SPEC.md) | 虚拟 DOM 状态掩码、`cosmic-text` 富文本与 `calc()` 求解 |
-| 🔌 **底层扩展与插件指南** | [docs/04_EXTENSIBILITY_AND_PLUGIN_SYSTEM.md](docs/04_EXTENSIBILITY_AND_PLUGIN_SYSTEM.md) | 七大注册总线（GPU 着色器、自定义节点、外接存储驱动）插件开发指南 |
-| 💡 **实战应用 1：完整工作台** | [examples/app.ui](examples/app.ui) | 包含导航栏、SQLite 数据库、水波特效与任务管理的工业级示例 |
-| 💡 **实战应用 2：极简计数器** | [examples/counter.ui](examples/counter.ui) | 极简 15 行代码演示单向响应式流 |
-| 💡 **实战应用 3：待办事项清单** | [examples/todo_app.ui](examples/todo_app.ui) | 列表循环、输入框双向数据流与状态切换 |
-| 💡 **实战应用 4：组件化仪表盘** | [examples/components_demo.ui](examples/components_demo.ui) | 自定义 `component` 封装与主题色彩复用 |
+The engine provides 7 low-level registration slots for deep enterprise customization without modifying the core:
+
+| Slot | Trait | Use Case | `.ui` Syntax |
+| :---: | :--- | :--- | :--- |
+| **1** | `CustomPainter` | Mount custom GPU shaders (ripples, blurs, particles) | `card effect="InteractiveRipple"` |
+| **2** | `CustomComponentDriver` | Register 3D viewports, video players, or charts | `plugin "CustomChart"` |
+| **3** | `CustomLayoutStrategy` | Implement non-standard layouts (Waterfall, Radial) | `box display="waterfall"` |
+| **4** | `CustomPropertyHandler` | Extend new CSS properties with Lerp animation interpolation | `glow-speed=2.5` |
+| **5** | `NativeHostFn` | Expose OS capabilities (File I/O, Clipboard, System Tray) | `btn -> fs.read("data.json")` |
+| **6** | `StorageDriverFactory` | Connect DuckDB, RocksDB, Redis, or IPC shared memory | `db.connect("duckdb://...")` |
+| **7** | `AssetProtocolLoader` | Decrypt and load proprietary assets and stylesheets | `@import "pak://secure.ui"` |
 
 ---
 
-## 六、 底层 12 大微内核引擎矩阵
-
-整个引擎采用**严格自底向上的单向无环依赖（Strict DAG）**设计，各模块结构严整：
+## 📦 Architecture Matrix (15 Crates)
 
 ```
 crates/
-├── css-types/          # 1. 基础纯 POD 数据类型（Color, Rect, Length, Dimension）
-├── charset-compat/     # 2. 字符集兼容层（自动剥离 BOM，GBK/UTF-16 互转，CJK 全角度量）
-├── crypto-pack/        # 3. 商业安全层（AOT 字节码封装 .binui，符号哈希脱敏，内存解密）
-├── dsl-parser/         # 4. 流式语法分析层（大括号状态机，Token 流，无环 AST 构建）
-├── element-core/       # 5. 虚拟 DOM 树（ElementTree，节点位掩码交互状态机）
-├── style-system/       # 6. 样式计算层（7级特异度打分，动态变量表，计算样式分流）
-├── css-animation/      # 7. 数学动效层（三次贝塞尔插值，通用数值/色彩补间状态机）
-├── layout-engine/      # 8. 几何排版层（基于纯 Rust Taffy 0.7 算法求解绝对物理坐标）
-├── render-backend/     # 9. 渲染指令流（DisplayList 硬件无关图元，DPI 视网膜缩放，IME 锚点）
-├── live-runtime/       # 10. 热重载与脏标记（三级刷新 DirtyMask，避免昂贵全树重排）
-├── script-engine/      # 11. 微型脚本引擎（表达式求值，变量作用域链，原生插件扩展槽）
-├── data-bridge/        # 12. 全栈数据库与 FFI（SQLite 本地表，Signal 响应式信号，C-ABI 导出）
-├── text-layout/        # 13. 高性能文本塑形与换行（集成 cosmic-text 原生字形度量）
-├── wasm-runtime/       # 14. 浏览器 WebAssembly 运行时（导出 Canvas 2D 绘图后端）
-└── app-shell/          # 15. 原生桌面主运行外壳（基于 winit 0.29 与 tiny-skia 软光栅）
+├── css-types/          # Pure POD foundation types (Color, Rect, Length, Dimension)
+├── charset-compat/     # BOM stripping, GBK/UTF-16 transcoder, CJK full-width metrics
+├── crypto-pack/        # AOT .binui bytecode, symbol obfuscation, stream crypto
+├── dsl-parser/         # Lexer, bracket tracker, AST with control flow & components
+├── element-core/       # ElementTree, NodeId, bitflags interactive state masks
+├── style-system/       # 7-level specificity cascade, computed styles, variable table
+├── css-animation/      # Cubic bezier easing, Lerp trait, transition state machine
+├── layout-engine/      # Taffy 0.7 flexbox bridge, LayoutRect geometric solver
+├── text-layout/        # cosmic-text font shaping, word-wrapping, paragraph layout
+├── render-backend/     # Hardware-agnostic DisplayList, DrawCommand, DPI scaling
+├── live-runtime/       # DirtyMask (Repaint, Relayout, Restructure), event hub
+├── script-engine/      # Inline expression evaluator, scope chain, plugin registry
+├── data-bridge/        # SQLite integration, reactive Signal<T>, C-ABI exports
+├── wasm-runtime/       # Canvas 2D WebAssembly backend for browser execution
+└── app-shell/          # Desktop runtime shell using winit 0.29 & tiny-skia
 ```
 
 ---
 
-## 许可证
-本项目基于 [MIT 许可证](LICENSE) 开源。欢迎 Star 与贡献代码！
+## 📚 Documentation Index
+
+* 📘 [Language Reference Manual (`LANGUAGE_GUIDE.md`)](docs/LANGUAGE_GUIDE.md) — Comprehensive syntax specification.
+* 📚 [Architecture Blueprint (`01_REQUIREMENTS_AND_ARCHITECTURE.md`)](docs/01_REQUIREMENTS_AND_ARCHITECTURE.md) — Architectural design and pipeline.
+* 🌐 [HTML/CSS Alignment Specification (`03_HTML_CSS_PHP_ALIGNMENT_SPEC.md`)](docs/03_HTML_CSS_PHP_ALIGNMENT_SPEC.md) — Web standards alignment.
+* 🔌 [Plugin System Guide (`04_EXTENSIBILITY_AND_PLUGIN_SYSTEM.md`)](docs/04_EXTENSIBILITY_AND_PLUGIN_SYSTEM.md) — Guide for custom extensions.
+
+---
+
+## 📄 License
+This project is open-source under the [MIT License](LICENSE). Contributions, feedback, and GitHub Stars are warmly welcome!
