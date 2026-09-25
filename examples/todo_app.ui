@@ -1,0 +1,41 @@
+// ==============================================================================
+// 示例 2：待办事项应用与双向绑定 (examples/todo_app.ui)
+// 语法特色：列表循环、输入框双向绑定、状态变更
+// ==============================================================================
+
+let tasks = [
+    { id: 1, text: "学习 Rust CSS-Like 前端语言", done: true },
+    { id: 2, text: "用声明式语法编写原生桌面应用", done: false },
+    { id: 3, text: "通过 GitHub Actions 一键出包跨平台", done: false }
+]
+let input_text = ""
+
+win "任务清单" (500, 600) bg=#0f172a {
+    col pad=24 gap=16 flex=1 {
+        txt "待办清单 (Todo List)" #f8fafc 22px bold
+
+        // 输入与添加行
+        row gap=8 align=center {
+            inp placeholder="输入新任务..." bind=input_text flex=1 pad=10 bg=#1e293b rad=6 #fff
+            btn "添加任务" pad=(10, 16) bg=#4f46e5 rad=6 #fff -> {
+                if len(input_text) > 0 {
+                    tasks.push({ id: len(tasks) + 1, text: input_text, done: false })
+                    input_text = ""
+                }
+            }
+        }
+
+        // 任务列表纵向流
+        col gap=8 flex=1 {
+            for item in tasks {
+                row pad=12 bg=#1e293b rad=8 justify=between align=center {
+                    row gap=10 align=center {
+                        box w=8 h=8 rad=4 bg=(item.done ? #22c55e : #eab308)
+                        txt item.text (item.done ? #64748b : #f8fafc) 14px
+                    }
+                    btn (item.done ? "已完成" : "标为完成") pad=(4, 8) bg=#334155 rad=4 -> item.done = !item.done
+                }
+            }
+        }
+    }
+}
