@@ -36,11 +36,13 @@ mod tests {
             .insert("class".to_string(), "card main-card".to_string());
 
         // 设置 btn 类名与 Hover 交互状态
-        let btn_node = tree.get_node_mut(btn).unwrap();
-        btn_node
-            .inline_styles
-            .insert("class".to_string(), "btn btn-primary".to_string());
-        btn_node.state_mask.insert(ElementStateMask::HOVERED);
+        {
+            let btn_node = tree.get_node_mut(btn).unwrap();
+            btn_node
+                .inline_styles
+                .insert("class".to_string(), "btn btn-primary".to_string());
+            btn_node.state_mask.insert(ElementStateMask::HOVERED);
+        }
 
         // 解析选择器 `.card > .btn:hover`
         let sel = Selector::parse(".card > .btn:hover").unwrap();
@@ -51,7 +53,7 @@ mod tests {
         // 校验选择器精确匹配当前按钮节点
         assert!(sel.matches(btn, &tree));
         // 校验不匹配未 hover 的节点
-        btn_node.state_mask.remove(ElementStateMask::HOVERED);
+        tree.get_node_mut(btn).unwrap().state_mask.remove(ElementStateMask::HOVERED);
         assert!(!sel.matches(btn, &tree));
     }
 

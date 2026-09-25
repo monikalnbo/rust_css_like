@@ -83,6 +83,7 @@ impl EffectRegistry {
 mod tests {
     use super::*;
     use crate::command::DrawCommand;
+    use crate::InteractiveRippleEffect;
 
     #[test]
     fn test_custom_effect_interaction_and_render() {

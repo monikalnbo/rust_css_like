@@ -59,37 +59,41 @@ impl Parser {
             .map(|t| t.span)
             .unwrap_or_default();
 
-        let kind = match self.peek() {
+        let (kind, tokens_to_consume) = match self.peek() {
             TokenKind::Ident(name) => {
                 let name = name.clone();
-                self.bump();
-                match name.as_str() {
-                    "window" | "win" => ScopeKind::Window,
-                    "span" => ScopeKind::Span,
-                    "theme" => ScopeKind::Theme,
-                    other => ScopeKind::Element(other.to_string()),
-                }
-            }
-            TokenKind::Colon => {
-                self.bump();
-                if let TokenKind::Ident(pseudo) = self.peek() {
-                    let pseudo = pseudo.clone();
-                    self.bump();
-                    ScopeKind::Pseudo(pseudo)
+                if self.tokens.get(self.cursor + 1).map(|t| &t.kind) == Some(&TokenKind::OpenBrace) {
+                    let k = match name.as_str() {
+                        "window" | "win" => ScopeKind::Window,
+                        "span" => ScopeKind::Span,
+                        "theme" => ScopeKind::Theme,
+                        other => ScopeKind::Element(other.to_string()),
+                    };
+                    (k, 1)
                 } else {
                     return Ok(None);
                 }
             }
-            TokenKind::Eof | TokenKind::CloseBrace => return Ok(None),
-            _ => {
-                self.bump();
-                return Ok(None);
+            TokenKind::Colon => {
+                if let Some(Token {
+                    kind: TokenKind::Ident(pseudo),
+                    ..
+                }) = self.tokens.get(self.cursor + 1)
+                {
+                    if self.tokens.get(self.cursor + 2).map(|t| &t.kind) == Some(&TokenKind::OpenBrace) {
+                        (ScopeKind::Pseudo(pseudo.clone()), 2)
+                    } else {
+                        return Ok(None);
+                    }
+                } else {
+                    return Ok(None);
+                }
             }
+            _ => return Ok(None),
         };
 
-        // 必须紧跟 `{`
-        if self.peek() != &TokenKind::OpenBrace {
-            return Ok(None);
+        for _ in 0..tokens_to_consume {
+            self.bump();
         }
 
         let mut block = ScopeBlock::new(kind, start_span);
