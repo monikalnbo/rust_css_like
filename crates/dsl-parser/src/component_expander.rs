@@ -72,10 +72,36 @@ impl ComponentExpander {
         arg_map: &HashMap<String, Value>,
     ) {
         for prop in &mut block.properties {
-            if let Value::Variable(v) = &prop.value {
-                if let Some(concrete_val) = arg_map.get(v) {
-                    prop.value = concrete_val.clone();
+            match &prop.value {
+                Value::Variable(v) => {
+                    let key = v.trim_start_matches('$');
+                    if let Some(concrete_val) = arg_map.get(key).or_else(|| arg_map.get(v)) {
+                        prop.value = concrete_val.clone();
+                    }
                 }
+                Value::Ident(id) => {
+                    if let Some(concrete_val) = arg_map.get(id) {
+                        prop.value = concrete_val.clone();
+                    }
+                }
+                Value::String(s) => {
+                    let mut s_new = s.clone();
+                    for (k, val) in arg_map {
+                        let needle = format!("${}", k);
+                        let val_str = match val {
+                            Value::String(vs) => vs.clone(),
+                            Value::Number(vn) => vn.to_string(),
+                            Value::HexColor(vh) => vh.clone(),
+                            Value::Variable(vv) => vv.clone(),
+                            Value::Ident(vi) => vi.clone(),
+                            Value::ActionCode(va) => va.clone(),
+                            Value::Expression(ve) => ve.clone(),
+                        };
+                        s_new = s_new.replace(&needle, &val_str);
+                    }
+                    prop.value = Value::String(s_new);
+                }
+                _ => {}
             }
         }
 

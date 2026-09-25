@@ -17,23 +17,31 @@ pub enum TokenKind {
     Ident(String),
     StringLiteral(String),
     Number(f32),
+    Dimension(f32, String), // 例如 14px, 28px, 100%
     HexColor(String),
-    Variable(String), // 例如 $theme.primary
+    Variable(String), // 例如 $theme.primary, $count
 
     // 约束符与界定符
-    OpenBrace,   // `{`
-    CloseBrace,  // `}`
-    OpenParen,   // `(`
-    CloseParen,  // `)`
-    Colon,       // `:`
-    Semicolon,   // `;`
-    Comma,       // `,`
-    Dot,         // `.`
-    Spread,      // `...`
-    Arrow,       // `->`
-    Question,    // `?`
-    Exclamation, // `!`
-    Equals,      // `=`
+    OpenBrace,    // `{`
+    CloseBrace,   // `}`
+    OpenParen,    // `(`
+    CloseParen,   // `)`
+    OpenBracket,  // `[`
+    CloseBracket, // `]`
+    Colon,        // `:`
+    Semicolon,    // `;`
+    Comma,        // `,`
+    Dot,          // `.`
+    Spread,       // `...`
+    Arrow,        // `->`
+    FatArrow,     // `=>`
+    Question,     // `?`
+    Exclamation,  // `!`
+    Equals,       // `=`
+    DoubleEquals, // `==`
+    NotEquals,    // `!=`
+    PlusEquals,   // `+=`
+    MinusEquals,  // `-=`
 
     // 算术操作符
     Plus,  // `+`
@@ -43,6 +51,9 @@ pub enum TokenKind {
 
     // 状态伪类标记
     PseudoColon, // 紧贴标示符的 `:`，如 `:hover`
+
+    // 换行与语句分隔
+    Newline,
 
     // 结束标记
     Eof,

@@ -49,16 +49,49 @@ impl<'a> Lexer<'a> {
     pub fn tokenize(&mut self) -> Result<Vec<Token>, String> {
         let mut tokens = Vec::new();
         while let Some(ch) = self.peek() {
-            if ch.is_whitespace() {
-                self.bump();
-                continue;
-            }
             if ch == '/' && self.peek_next() == Some('/') {
+                let start = self.cursor;
+                let line = self.line;
+                let col = self.column;
                 while let Some((_, c)) = self.bump() {
                     if c == '\n' {
                         break;
                     }
                 }
+                while let Some(c) = self.peek() {
+                    if c == '\r' || c == '\n' || c == ' ' || c == '\t' {
+                        self.bump();
+                    } else {
+                        break;
+                    }
+                }
+                tokens.push(Token::new(TokenKind::Newline, Span::new(start, self.cursor, line, col)));
+                continue;
+            }
+
+            if ch == '\r' {
+                self.bump();
+                continue;
+            }
+
+            if ch == '\n' {
+                let start = self.cursor;
+                let line = self.line;
+                let col = self.column;
+                self.bump();
+                while let Some(c) = self.peek() {
+                    if c == '\r' || c == '\n' || c == ' ' || c == '\t' {
+                        self.bump();
+                    } else {
+                        break;
+                    }
+                }
+                tokens.push(Token::new(TokenKind::Newline, Span::new(start, self.cursor, line, col)));
+                continue;
+            }
+
+            if ch.is_whitespace() {
+                self.bump();
                 continue;
             }
 
@@ -83,6 +116,14 @@ impl<'a> Lexer<'a> {
                     self.bump();
                     TokenKind::CloseParen
                 }
+                '[' => {
+                    self.bump();
+                    TokenKind::OpenBracket
+                }
+                ']' => {
+                    self.bump();
+                    TokenKind::CloseBracket
+                }
                 ':' => {
                     self.bump();
                     TokenKind::Colon
@@ -101,11 +142,21 @@ impl<'a> Lexer<'a> {
                 }
                 '!' => {
                     self.bump();
-                    TokenKind::Exclamation
+                    if self.peek() == Some('=') {
+                        self.bump();
+                        TokenKind::NotEquals
+                    } else {
+                        TokenKind::Exclamation
+                    }
                 }
                 '+' => {
                     self.bump();
-                    TokenKind::Plus
+                    if self.peek() == Some('=') {
+                        self.bump();
+                        TokenKind::PlusEquals
+                    } else {
+                        TokenKind::Plus
+                    }
                 }
                 '*' => {
                     self.bump();
@@ -117,13 +168,24 @@ impl<'a> Lexer<'a> {
                 }
                 '=' => {
                     self.bump();
-                    TokenKind::Equals
+                    if self.peek() == Some('=') {
+                        self.bump();
+                        TokenKind::DoubleEquals
+                    } else if self.peek() == Some('>') {
+                        self.bump();
+                        TokenKind::FatArrow
+                    } else {
+                        TokenKind::Equals
+                    }
                 }
                 '-' => {
                     self.bump();
                     if self.peek() == Some('>') {
                         self.bump();
                         TokenKind::Arrow
+                    } else if self.peek() == Some('=') {
+                        self.bump();
+                        TokenKind::MinusEquals
                     } else {
                         TokenKind::Minus
                     }

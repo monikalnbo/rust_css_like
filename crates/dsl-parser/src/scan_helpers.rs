@@ -78,6 +78,26 @@ impl ScanHelpers {
             }
         }
         let val = num_str.parse::<f32>().unwrap_or(0.0);
-        TokenKind::Number(val)
+
+        if lexer.peek() == Some('%') {
+            lexer.bump();
+            return TokenKind::Dimension(val, "%".to_string());
+        }
+
+        let mut unit = String::new();
+        while let Some(c) = lexer.peek() {
+            if c.is_ascii_alphabetic() {
+                unit.push(c);
+                lexer.bump();
+            } else {
+                break;
+            }
+        }
+
+        if !unit.is_empty() {
+            TokenKind::Dimension(val, unit)
+        } else {
+            TokenKind::Number(val)
+        }
     }
 }
