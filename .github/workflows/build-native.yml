@@ -1,4 +1,4 @@
-name: Cross-Platform Native Build (.exe & .dmg)
+name: "Cross-Platform Native Build (.exe & .dmg)"
 
 on:
   push:
@@ -46,7 +46,38 @@ jobs:
           path: dist/rust-css-like-windows-x64.zip
 
   # -------------------------------------------------------------
-  # Job 2: 构建 macOS 原生程序 (.dmg / .app)
+  # Job 2: 构建 Linux 原生可执行程序
+  # -------------------------------------------------------------
+  build-linux:
+    name: Build Linux (x86_64)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Release Binary
+        run: cargo build --release --workspace
+
+      - name: Package Linux Artifacts
+        run: |
+          mkdir -p dist/linux
+          find target/release/ -maxdepth 1 -type f -executable ! -name "*.so" ! -name "build_script*" -exec cp {} dist/linux/ \;
+          tar -czvf dist/rust-css-like-linux-x64.tar.gz -C dist/linux .
+
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64-executable
+          path: dist/rust-css-like-linux-x64.tar.gz
+
+  # -------------------------------------------------------------
+  # Job 3: 构建 macOS 原生程序 (.dmg / .app)
   # -------------------------------------------------------------
   build-macos:
     name: Build macOS (.dmg)
@@ -55,10 +86,13 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Setup Rust Toolchain (Universal: ARM64 + x86_64)
+      - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-apple-darwin, x86_64-apple-darwin
+          targets: aarch64-apple-darwin
+
+      - name: Add Intel Target
+        run: rustup target add x86_64-apple-darwin
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
@@ -71,7 +105,6 @@ jobs:
       - name: Package macOS Universal Artifacts
         run: |
           mkdir -p dist/macos
-          # 如果有二进制输出，合并生成 Universal Binary
           if [ -f target/aarch64-apple-darwin/release/app-shell ]; then
             lipo -create -output dist/macos/rust-css-like-universal \
               target/aarch64-apple-darwin/release/app-shell \
